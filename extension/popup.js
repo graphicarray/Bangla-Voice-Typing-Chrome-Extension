@@ -2,7 +2,7 @@
 
 const API = 'https://generativelanguage.googleapis.com/v1beta';
 const $ = (id) => document.getElementById(id);
-const DEFAULTS = { apiKey: '', model: '', keepEn: false, bnDigits: true, showBtn: true, last: '' };
+const DEFAULTS = { apiKey: '', model: '', keepEn: false, bnDigits: true, clickBtn: false, last: '' };
 let cfg = { ...DEFAULTS };
 
 function setStatus(text, cls = '') {
@@ -58,7 +58,7 @@ $('saveKey').addEventListener('click', async () => {
   loadModels();
 });
 $('model').addEventListener('change', (e) => save({ model: e.target.value }));
-for (const k of ['keepEn', 'bnDigits', 'showBtn']) {
+for (const k of ['keepEn', 'bnDigits', 'clickBtn']) {
   $(k).addEventListener('change', (e) => save({ [k]: e.target.checked }));
 }
 $('grant').addEventListener('click', () => chrome.tabs.create({ url: chrome.runtime.getURL('permission.html') }));
@@ -72,7 +72,7 @@ $('copy').addEventListener('click', async () => {
   $('apiKey').value = cfg.apiKey;
   $('keepEn').checked = cfg.keepEn;
   $('bnDigits').checked = cfg.bnDigits;
-  $('showBtn').checked = cfg.showBtn;
+  $('clickBtn').checked = cfg.clickBtn;
   $('last').value = cfg.last;
   if (cfg.model) $('model').add(new Option(cfg.model, cfg.model));
   if (cfg.apiKey) loadModels();

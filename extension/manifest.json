@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Bangla Voice Typing",
   "short_name": "Bangla Voice",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Speak Bangla, get clean punctuated Bangla text typed straight into the page. By Graphicarray.",
   "permissions": [
     "storage",

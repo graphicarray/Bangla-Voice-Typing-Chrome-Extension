@@ -9,6 +9,7 @@
 
   // Runs in every frame, including blank iframes (Google Docs types through one).
   let holding = false;
+  let swallowAltUp = false; // stop Docs/Chrome from grabbing focus when Alt is let go
   const release = () => {
     if (holding) { holding = false; send('stop'); }
   };
@@ -16,15 +17,64 @@
     if (!isHold(e)) return;
     e.preventDefault();
     e.stopImmediatePropagation();
+    swallowAltUp = true;
     if (!holding) { holding = true; send('start'); }
   }, true);
   addEventListener('keyup', (e) => {
-    if (!holding || !(e.code === 'KeyC' || e.key === 'Alt')) return;
+    const isKey = e.code === 'KeyC' || e.key === 'Alt';
+    if (e.key === 'Alt' && swallowAltUp) {
+      swallowAltUp = false;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      release();
+      return;
+    }
+    if (!holding || !isKey) return;
     e.preventDefault();
     e.stopImmediatePropagation();
     release();
   }, true);
   addEventListener('blur', release);
+
+  // Remember the last editable thing focused in this frame (Docs' hidden box lives here).
+  let lastEditable = null;
+  const editableOf = (n) => {
+    while (n && n.shadowRoot && n.shadowRoot.activeElement) n = n.shadowRoot.activeElement;
+    if (!n) return null;
+    const field = n.tagName === 'TEXTAREA' ||
+      (n.tagName === 'INPUT' && /^(text|search|url|email|tel|)$/i.test(n.type));
+    return field || n.isContentEditable ? n : null;
+  };
+  addEventListener('focusin', (e) => {
+    const t = editableOf(e.composedPath()[0]);
+    if (t) lastEditable = t;
+  }, true);
+
+  function insertHere(text) {
+    let el = editableOf(document.activeElement);
+    if (!el && lastEditable && lastEditable.isConnected && document.hasFocus()) el = lastEditable;
+    if (!el) return false;
+    el.focus();
+    const field = el.tagName === 'TEXTAREA' || el.tagName === 'INPUT';
+    if (document.execCommand('insertText', false, text)) return true;
+    if (field) {
+      el.setRangeText(text, el.selectionStart, el.selectionEnd, 'end');
+      el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
+      return true;
+    }
+    try { // last try for editors that only listen to paste
+      const dt = new DataTransfer();
+      dt.setData('text/plain', text);
+      const ev = new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true });
+      el.dispatchEvent(ev);
+      return ev.defaultPrevented;
+    } catch { return false; }
+  }
+
+  chrome.runtime.onMessage.addListener((m, _s, reply) => {
+    if (m.type !== 'insert') return;
+    reply(insertHere(m.text));
+  });
 
   if (window !== top) return; // floating button lives in the top frame only
 
@@ -84,6 +134,14 @@
   btn.addEventListener('mousedown', (e) => e.preventDefault()); // keep focus in the text box
   btn.addEventListener('click', () => send('toggle'));
 
+  // Hidden by default. Shows only while recording / typing (then fades away),
+  // unless the "always show click button" option is on.
+  let always = false;
+  const attach = () => {
+    if (!host.isConnected) (document.body || document.documentElement).appendChild(host);
+  };
+  const detach = () => { if (!always) host.remove(); };
+
   let hide;
   chrome.runtime.onMessage.addListener((m) => {
     if (m.type !== 'ui') return;
@@ -92,22 +150,17 @@
     clearTimeout(hide);
     tip.style.display = text ? 'block' : 'none';
     tip.textContent = text;
-    if (m.state === 'idle' && text) hide = setTimeout(() => (tip.style.display = 'none'), 3500);
+    if (m.state !== 'idle') return attach();
+    if (text) {
+      attach();
+      hide = setTimeout(() => { tip.style.display = 'none'; detach(); }, 3500);
+    } else detach();
   });
 
+  // Optional always-visible click button. Off by default.
+  const apply = (v) => { always = !!v; always ? attach() : (btn.className === '' && tip.style.display !== 'block' && host.remove()); };
+  chrome.storage.local.get({ clickBtn: false }).then((c) => apply(c.clickBtn));
+  chrome.storage.onChanged.addListener((c) => { if (c.clickBtn) apply(c.clickBtn.newValue); });
   // Some pages (Docs) rebuild their DOM; re-attach if our button gets dropped.
-  let want = true;
-  const attach = () => {
-    if (want && !host.isConnected) (document.body || document.documentElement).appendChild(host);
-  };
-  chrome.storage.local.get({ showBtn: true }).then((c) => {
-    want = c.showBtn;
-    attach();
-  });
-  chrome.storage.onChanged.addListener((c) => {
-    if (!c.showBtn) return;
-    want = c.showBtn.newValue;
-    want ? attach() : host.remove();
-  });
-  setInterval(attach, 2000);
+  setInterval(() => { if (always) attach(); }, 2000);
 })();
