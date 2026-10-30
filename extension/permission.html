@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Microphone access · Bangla Voice Typing</title>
+<style>
+  :root{--abyss:#001E36;--panel:#062847;--edge:#0F4A7A;--cyan:#00CDFF;--slate:#8FA7BF;--red:#FF5D6C;--green:#3DD68C;
+    --font:Inter,"Segoe UI",system-ui,Verdana,sans-serif}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;color:#fff;font:16px/1.5 var(--font);
+    background:radial-gradient(900px 500px at 50% -10%,#06406E,var(--abyss) 60%)}
+  .card{width:min(440px,92vw);text-align:center;padding:32px 24px;background:var(--panel);border:1px solid var(--edge);border-radius:20px}
+  .logo{display:inline-block;width:96px;height:96px;border-radius:24px;overflow:hidden}
+  h1{font-size:22px;letter-spacing:-.02em;margin:16px 0 4px}
+  .by,.foot a{color:var(--cyan);text-decoration:none;font-weight:600;font-size:13px}
+  #msg{margin:24px 0 0;color:#fff}
+  #msg.err{color:var(--red)} #msg.ok{color:var(--green)}
+  .foot{margin-top:24px;font-size:12px}
+  .foot a{color:var(--slate);font-weight:400}
+  a:hover{filter:drop-shadow(0 0 8px #00CDFFAA)}
+  a:focus-visible{outline:1px solid var(--cyan);outline-offset:3px;border-radius:12px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <a class="logo" href="https://www.linkedin.com/in/graphicarray" target="_blank" rel="noopener noreferrer" aria-label="Graphicarray on LinkedIn">
+      <img src="brand/logo.svg" width="96" height="96" alt="">
+    </a>
+    <h1>Microphone access</h1>
+    <a class="by" href="https://www.linkedin.com/in/graphicarray" target="_blank" rel="noopener noreferrer">by Graphicarray</a>
+    <p id="msg">Click “Allow” in the browser prompt…</p>
+    <div class="foot"><a href="https://www.linkedin.com/in/graphicarray" target="_blank" rel="noopener noreferrer">Graphicarray · Numan Ahmed</a></div>
+  </div>
+  <script src="permission.js"></script>
+</body>
+</html>

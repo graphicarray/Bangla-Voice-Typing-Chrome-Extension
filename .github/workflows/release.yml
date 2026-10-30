@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Zip extension
+        run: |
+          cd extension
+          zip -r "../bangla-voice-typing-${GITHUB_REF_NAME}.zip" . -x "*.DS_Store"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: bangla-voice-typing-*.zip
+          generate_release_notes: true

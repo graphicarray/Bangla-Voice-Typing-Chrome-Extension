@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bangla Voice Typing</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<header class="ga-header">
+  <a class="ga-logo ga-link" href="https://www.linkedin.com/in/graphicarray" target="_blank" rel="noopener noreferrer" aria-label="Graphicarray on LinkedIn">
+    <img src="brand/logo.svg" width="44" height="44" alt="">
+  </a>
+  <div>
+    <div class="ga-title">Bangla Voice Typing</div>
+    <a class="ga-by ga-link" href="https://www.linkedin.com/in/graphicarray" target="_blank" rel="noopener noreferrer">by Graphicarray</a>
+  </div>
+</header>
+
+<main>
+  <section class="ga-card">
+    <div class="ga-label">Gemini connection</div>
+    <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Google AI Studio API key">
+    <p class="ga-help"><a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer">Get a free key</a>. It stays in this browser only.</p>
+    <div class="ga-label">Model</div>
+    <select id="model"><option value="">Add API key first</option></select>
+    <button id="saveKey" class="ga-btn">Save &amp; load models</button>
+  </section>
+
+  <section class="ga-card">
+    <div class="ga-label">Options</div>
+    <label class="ga-check"><input id="bnDigits" type="checkbox"> Bangla digits (১২৩)</label>
+    <label class="ga-check"><input id="keepEn" type="checkbox"> Keep English words in English</label>
+    <label class="ga-check"><input id="showBtn" type="checkbox"> Show mic button on pages</label>
+  </section>
+
+  <section class="ga-card">
+    <div class="ga-label">Microphone</div>
+    <button id="grant" class="ga-btn2">Grant microphone access</button>
+    <div id="status"></div>
+  </section>
+
+  <section class="ga-card">
+    <div class="ga-label">Last transcript</div>
+    <textarea id="last" rows="3" readonly placeholder="Your last dictation shows here."></textarea>
+    <button id="copy" class="ga-btn3">Copy</button>
+  </section>
+
+  <p class="ga-help">Click a text box, then hold <b>Alt + C</b> and speak. Release to type.</p>
+</main>
+
+<footer class="ga-footer">
+  <a class="ga-link" href="https://www.linkedin.com/in/graphicarray" target="_blank" rel="noopener noreferrer">Graphicarray · Numan Ahmed</a>
+  <span class="ga-chip">v2.1</span>
+</footer>
+
+<script src="popup.js"></script>
+</body>
+</html>
